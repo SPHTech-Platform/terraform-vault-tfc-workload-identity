@@ -26,17 +26,19 @@ resource "vault_jwt_auth_backend" "this" {
 }
 
 locals {
-  roles = merge([for org, workspaces in var.workspaces : {
-    for ws in workspaces : "${org}-${ws}" => { role_name = format(var.role_name_format, org, ws), org = org, ws = ws }
-  }]...)
+  workspaces = merge([for org, workspaces in var.workspaces : {
+    for ws in workspaces : "${org}-${ws}" => {
+      org = org
+      ws  = ws
 
-  identities = merge([for org, workspaces in var.workspaces : {
-    for ws in workspaces : "${org}-${ws}" => { name = format(var.identity_name_format, org, ws), org = org, ws = ws }
+      role_name     = format(var.role_name_format, org, ws)
+      identity_name = format(var.identity_name_format, org, ws)
+    }
   }]...)
 }
 
 resource "vault_jwt_auth_backend_role" "roles" {
-  for_each = local.roles
+  for_each = local.workspaces
 
   namespace = var.namespace
 
@@ -63,11 +65,11 @@ resource "vault_jwt_auth_backend_role" "roles" {
 }
 
 resource "vault_identity_entity" "workspaces" {
-  for_each = var.enable_identity_management ? local.identities : {}
+  for_each = var.enable_identity_management ? local.workspaces : {}
 
   namespace = var.namespace
 
-  name              = each.value.name
+  name              = each.value.identity_name
   external_policies = true
   metadata = {
     terraform_organization_name = each.value.org
@@ -83,7 +85,7 @@ resource "vault_identity_entity" "workspaces" {
 }
 
 resource "vault_identity_entity_alias" "workspaces" {
-  for_each = var.enable_identity_management ? local.identities : {}
+  for_each = var.enable_identity_management ? local.workspaces : {}
 
   namespace = var.namespace
 
