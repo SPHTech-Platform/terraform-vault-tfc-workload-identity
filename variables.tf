@@ -7,7 +7,7 @@ variable "namespace" {
     condition = var.namespace != null ? (
       !startswith(var.namespace, "/") && !endswith(var.namespace, "/")
     ) : true
-    error_message = "Namespace cannot begin or end with\"\""
+    error_message = "Namespace cannot begin or end with \"\""
   }
 }
 
