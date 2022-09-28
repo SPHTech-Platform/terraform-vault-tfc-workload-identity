@@ -1,0 +1,122 @@
+variable "namespace" {
+  description = "Namespace relative to the provider namespace. Vault Enterprise only"
+  type        = string
+  default     = null
+
+  validation {
+    condition = var.namespace != null ? (
+      !startswith(var.namespace, "/") && !endswith(var.namespace, "/")
+    ) : true
+    error_message = "Namespace cannot begin or end with \"\""
+  }
+}
+
+variable "path" {
+  description = "Path to mount the JWT Auth backend"
+  type        = string
+  default     = "jwt"
+}
+
+variable "auth_description" {
+  description = "Description of the JWT Auth Backend"
+  type        = string
+  default     = "Terraform Cloud"
+}
+
+variable "auth_token_issuer" {
+  description = "Token issuer of JWT token"
+  type        = string
+  default     = "https://app.terraform.io"
+
+  validation {
+    condition     = startswith(var.auth_token_issuer, "https://") && !endswith(var.auth_token_issuer, "/")
+    error_message = "Token issuer URI should start with https:// and not end with a slash"
+  }
+}
+
+variable "auth_tune" {
+  description = "Auth mount tune settings"
+  type = object({
+    default_lease_ttl            = optional(string)
+    max_lease_ttl                = optional(string)
+    audit_non_hmac_response_keys = optional(string)
+    audit_non_hmac_request_keys  = optional(string)
+    listing_visibility           = optional(string)
+    passthrough_request_headers  = optional(string)
+    allowed_response_headers     = optional(string)
+    token_type                   = optional(string)
+  })
+  default = null
+}
+
+variable "bound_audiences" {
+  description = "List of audiences to be allowed for JWT auth roles"
+  type        = list(string)
+  default     = ["tfc.workload.identity"]
+}
+
+variable "workspaces" {
+  description = "List of workspaces to provide access to. Use * for wildcard. If wildcard is used, identity management cannot be enabled"
+  type        = map(list(string)) # Key is Organisation name
+}
+
+variable "role_name_format" {
+  description = "Format string to generate role namess. The first parameter is the organization, and the second is the workspace name"
+  type        = string
+  default     = "%[1]s-%[2]s"
+}
+
+variable "claim_mappings" {
+  description = "Mapping of claims to metadata"
+  type        = map(string)
+  default = {
+    terraform_run_phase         = "terraform_run_phase"
+    terraform_workspace_id      = "terraform_workspace_id"
+    terraform_organization_id   = "terraform_organization_id"
+    terraform_organization_name = "terraform_organization_name"
+    terraform_run_id            = "terraform_run_id"
+    terraform_full_workspace    = "terraform_full_workspace"
+  }
+}
+
+variable "user_claim" {
+  description = "Claim to be used as the Identity Entity user"
+  type        = string
+  default     = "terraform_full_workspace"
+}
+
+variable "token_policies" {
+  description = "Default token policies to apply to all roles"
+  type        = list(string)
+  default     = []
+}
+
+variable "token_ttl" {
+  description = "The incremental lifetime for generated tokens in number of seconds. Its current value will be referenced at renewal time."
+  type        = number
+  default     = 600
+}
+
+variable "token_max_ttl" {
+  description = "The maximum lifetime for generated tokens in number of seconds. Its current value will be referenced at renewal time."
+  type        = number
+  default     = 600
+}
+
+variable "token_explicit_max_ttl" {
+  description = "If set, will encode an explicit max TTL onto the token in number of seconds. This is a hard cap even if token_ttl and token_max_ttl would otherwise allow a renewal."
+  type        = number
+  default     = 600
+}
+
+variable "enable_identity_management" {
+  description = "Enable Identity Entity management. This only works if workspace names contains no wildcard"
+  type        = bool
+  default     = true
+}
+
+variable "identity_name_format" {
+  description = "Identity name format string. The first parameter is the organization, and the second is the workspace name"
+  type        = string
+  default     = "tfc-%[1]s-%[2]s"
+}
