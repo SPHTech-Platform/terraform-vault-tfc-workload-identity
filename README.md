@@ -46,7 +46,6 @@ No modules.
 | <a name="input_token_max_ttl"></a> [token\_max\_ttl](#input\_token\_max\_ttl) | The maximum lifetime for generated tokens in number of seconds. Its current value will be referenced at renewal time. | `number` | `600` | no |
 | <a name="input_token_policies"></a> [token\_policies](#input\_token\_policies) | Default token policies to apply to all roles | `list(string)` | `[]` | no |
 | <a name="input_token_ttl"></a> [token\_ttl](#input\_token\_ttl) | The incremental lifetime for generated tokens in number of seconds. Its current value will be referenced at renewal time. | `number` | `600` | no |
-| <a name="input_user_claim"></a> [user\_claim](#input\_user\_claim) | Claim to be used as the Identity Entity user | `string` | `"terraform_full_workspace"` | no |
 | <a name="input_workspaces"></a> [workspaces](#input\_workspaces) | List of workspaces to provide access to. Use * for wildcard. If wildcard is used, identity management cannot be enabled | `map(list(string))` | n/a | yes |
 
 ## Outputs

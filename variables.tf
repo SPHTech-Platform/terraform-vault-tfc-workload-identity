@@ -79,12 +79,6 @@ variable "claim_mappings" {
   }
 }
 
-variable "user_claim" {
-  description = "Claim to be used as the Identity Entity user"
-  type        = string
-  default     = "terraform_full_workspace"
-}
-
 variable "token_policies" {
   description = "Default token policies to apply to all roles"
   type        = list(string)
