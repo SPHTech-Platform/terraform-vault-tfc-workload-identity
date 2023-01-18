@@ -79,12 +79,6 @@ variable "claim_mappings" {
   }
 }
 
-variable "user_claim" {
-  description = "Claim to be used as the Identity Entity user"
-  type        = string
-  default     = "terraform_full_workspace"
-}
-
 variable "token_policies" {
   description = "Default token policies to apply to all roles"
   type        = list(string)
@@ -119,4 +113,10 @@ variable "identity_name_format" {
   description = "Identity name format string. The first parameter is the organization, and the second is the workspace name"
   type        = string
   default     = "tfc-%[1]s-%[2]s"
+}
+
+variable "tfc_project_support_match" {
+  description = "The key to use for Terraform Cloud Project matching in the subject key. This is to work around the module not support projects. You should set this to 'Default Project' or '*'"
+  type        = string
+  default     = "*"
 }

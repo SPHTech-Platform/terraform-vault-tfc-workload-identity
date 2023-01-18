@@ -49,7 +49,7 @@ resource "vault_jwt_auth_backend_role" "roles" {
 
   bound_claims_type = "glob"
   bound_claims = {
-    sub = "organization:${each.value.org}:workspace:${each.value.ws}:run_phase:*"
+    sub = "organization:${each.value.org}:project:${var.tfc_project_support_match}:workspace:${each.value.ws}:run_phase:*"
 
     terraform_organization_name = each.value.org
     terraform_workspace_name    = each.value.ws
