@@ -120,3 +120,9 @@ variable "identity_name_format" {
   type        = string
   default     = "tfc-%[1]s-%[2]s"
 }
+
+variable "tfc_project_support_match" {
+  description = "The key to use for Terraform Cloud Project matching in the subject key. This is to work around the module not support projects. You should set this to 'Default Project' or '*'"
+  type        = string
+  default     = "*"
+}
