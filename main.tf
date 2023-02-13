@@ -89,7 +89,7 @@ resource "vault_identity_entity_alias" "workspaces" {
 
   namespace = var.namespace
 
-  name           = "organization:${each.value.org}:workspace:${each.value.ws}"
+  name           = "organization:${each.value.org}:project:${var.tfc_default_project}:workspace:${each.value.ws}"
   mount_accessor = vault_jwt_auth_backend.this.accessor
   canonical_id   = vault_identity_entity.workspaces[each.key].id
 
