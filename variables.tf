@@ -120,3 +120,9 @@ variable "tfc_project_support_match" {
   type        = string
   default     = "*"
 }
+
+variable "tfc_default_project" {
+  description = "Name of TFC Default Project"
+  type        = string
+  default     = "Default Project"
+}

@@ -41,6 +41,7 @@ No modules.
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace relative to the provider namespace. Vault Enterprise only | `string` | `null` | no |
 | <a name="input_path"></a> [path](#input\_path) | Path to mount the JWT Auth backend | `string` | `"jwt"` | no |
 | <a name="input_role_name_format"></a> [role\_name\_format](#input\_role\_name\_format) | Format string to generate role namess. The first parameter is the organization, and the second is the workspace name | `string` | `"%[1]s-%[2]s"` | no |
+| <a name="input_tfc_default_project"></a> [tfc\_default\_project](#input\_tfc\_default\_project) | Name of TFC Default Project | `string` | `"Default Project"` | no |
 | <a name="input_tfc_project_support_match"></a> [tfc\_project\_support\_match](#input\_tfc\_project\_support\_match) | The key to use for Terraform Cloud Project matching in the subject key. This is to work around the module not support projects. You should set this to 'Default Project' or '*' | `string` | `"*"` | no |
 | <a name="input_token_explicit_max_ttl"></a> [token\_explicit\_max\_ttl](#input\_token\_explicit\_max\_ttl) | If set, will encode an explicit max TTL onto the token in number of seconds. This is a hard cap even if token\_ttl and token\_max\_ttl would otherwise allow a renewal. | `number` | `600` | no |
 | <a name="input_token_max_ttl"></a> [token\_max\_ttl](#input\_token\_max\_ttl) | The maximum lifetime for generated tokens in number of seconds. Its current value will be referenced at renewal time. | `number` | `600` | no |
