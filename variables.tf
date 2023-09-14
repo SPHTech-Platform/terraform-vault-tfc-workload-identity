@@ -57,13 +57,13 @@ variable "bound_audiences" {
 
 variable "workspaces" {
   description = "List of workspaces to provide access to. Use * for wildcard. If wildcard is used, identity management cannot be enabled"
-  type        = map(list(string)) # Key is Organisation name
+  type        = map(map(list(string))) # First Key is Organisation name, second Key is Project
 }
 
 variable "role_name_format" {
   description = "Format string to generate role namess. The first parameter is the organization, and the second is the workspace name"
   type        = string
-  default     = "%[1]s-%[2]s"
+  default     = "%[1]s-%[2]s-%[3]s"
 }
 
 variable "claim_mappings" {
@@ -112,7 +112,7 @@ variable "enable_identity_management" {
 variable "identity_name_format" {
   description = "Identity name format string. The first parameter is the organization, and the second is the workspace name"
   type        = string
-  default     = "tfc-%[1]s-%[2]s"
+  default     = "tfc-%[1]s-%[2]s-%[3]s"
 }
 
 variable "tfc_project_support_match" {
