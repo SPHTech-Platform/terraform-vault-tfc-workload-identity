@@ -26,15 +26,15 @@ resource "vault_jwt_auth_backend" "this" {
 }
 
 locals {
-  workspaces = merge([for org, workspaces in var.workspaces : {
-    for ws in workspaces : "${org}-${ws}" => {
-      org = org
-      ws  = ws
-
-      role_name     = format(var.role_name_format, org, ws)
-      identity_name = format(var.identity_name_format, org, ws)
-    }
-  }]...)
+  workspaces = merge(flatten([for org, project in var.workspaces :
+    [for proj, workspace in project : { for ws in workspace : "${org}-${proj}-${ws}" => {
+      org           = org
+      project       = proj
+      ws            = ws
+      role_name     = format(var.role_name_format, org, proj, ws)
+      identity_name = format(var.identity_name_format, org, proj, ws)
+    } }]
+  ])...)
 }
 
 resource "vault_jwt_auth_backend_role" "roles" {
@@ -49,9 +49,10 @@ resource "vault_jwt_auth_backend_role" "roles" {
 
   bound_claims_type = "glob"
   bound_claims = {
-    sub = "organization:${each.value.org}:project:${var.tfc_project_support_match}:workspace:${each.value.ws}:run_phase:*"
+    sub = "organization:${each.value.org}:project:${each.value.project}:workspace:${each.value.ws}:run_phase:*"
 
     terraform_organization_name = each.value.org
+    terraform_project_name      = each.value.project
     terraform_workspace_name    = each.value.ws
   }
 
@@ -73,6 +74,7 @@ resource "vault_identity_entity" "workspaces" {
   external_policies = true
   metadata = {
     terraform_organization_name = each.value.org
+    terraform_project_name      = each.value.project
     terraform_workspace_name    = each.value.ws
   }
 
@@ -89,7 +91,7 @@ resource "vault_identity_entity_alias" "workspaces" {
 
   namespace = var.namespace
 
-  name           = "organization:${each.value.org}:project:${var.tfc_default_project}:workspace:${each.value.ws}"
+  name           = "organization:${each.value.org}:project:${each.value.project}:workspace:${each.value.ws}"
   mount_accessor = vault_jwt_auth_backend.this.accessor
   canonical_id   = vault_identity_entity.workspaces[each.key].id
 
