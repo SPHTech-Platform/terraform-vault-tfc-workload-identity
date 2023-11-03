@@ -5,19 +5,18 @@ output "auth_mount_accessor" {
 
 output "workspaces" {
   description = "Workspace information"
-  value = { for org, project in var.workspaces : org => merge([for proj, workspace in project :
-    { for ws in workspace : ws => merge(
+  value = { for k, v in local.workspaces : v.org => tomap( { (v.ws) = merge(
       {
-        org       = org
-        project   = proj
-        workspace = ws
-        role      = vault_jwt_auth_backend_role.roles["${org}-${proj}-${ws}"].role_name
+        org       = v.org
+        project   = v.proj
+        workspace = v.ws
+        role      = vault_jwt_auth_backend_role.roles[k].role_name
       },
       var.enable_identity_management ? {
-        identity_name  = vault_identity_entity.workspaces["${org}-${proj}-${ws}"].name
-        identity_id    = vault_identity_entity.workspaces["${org}-${proj}-${ws}"].id
-        identity_alias = vault_identity_entity_alias.workspaces["${org}-${proj}-${ws}"].name
+        identity_name  = vault_identity_entity.workspaces[k].name
+        identity_id    = vault_identity_entity.workspaces[k].id
+        identity_alias = vault_identity_entity_alias.workspaces[k].name
       } : {}
-    ) }]...)
+    ) })
   }
 }
