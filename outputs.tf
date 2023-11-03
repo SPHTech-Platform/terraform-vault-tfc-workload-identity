@@ -8,7 +8,7 @@ output "workspaces" {
   value = { for k, v in local.workspaces : v.org => tomap({ (v.ws) = merge(
     {
       org       = v.org
-      project   = v.proj
+      project   = v.project
       workspace = v.ws
       role      = vault_jwt_auth_backend_role.roles[k].role_name
     },
