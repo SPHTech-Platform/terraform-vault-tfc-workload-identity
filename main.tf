@@ -27,12 +27,12 @@ resource "vault_jwt_auth_backend" "this" {
 
 locals {
   workspaces = merge(flatten([for org, project in var.workspaces :
-    [for proj, workspace in project : { for ws in workspace : "${org}-${proj}-${ws}" => {
+    [for proj, workspace in project : { for ws in workspace : replace(format("%s-%s-%s", org, proj, ws), "/\\W|_|\\s/", "-") => {
       org           = org
       project       = proj
       ws            = ws
-      role_name     = format(var.role_name_format, org, proj, ws)
-      identity_name = format(var.identity_name_format, org, proj, ws)
+      role_name     = replace(format(var.role_name_format, org, proj, ws), "/\\W|_|\\s/", "-")
+      identity_name = replace(format(var.identity_name_format, org, proj, ws), "/\\W|_|\\s/", "-")
     } }]
   ])...)
 }
