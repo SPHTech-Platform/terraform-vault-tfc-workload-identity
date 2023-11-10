@@ -126,9 +126,3 @@ variable "tfc_default_project" {
   type        = string
   default     = "Default Project"
 }
-
-variable "key_name_format" {
-  description = "Format string to generate key names. The first parameter is the organization, the second is the project name and third is the workspace name"
-  type        = string
-  default     = "%[1]s-%[2]s-%[3]s"
-}
