@@ -39,8 +39,8 @@ variable "auth_tune" {
   type = object({
     default_lease_ttl            = optional(string)
     max_lease_ttl                = optional(string)
-    audit_non_hmac_response_keys = optional(string)
-    audit_non_hmac_request_keys  = optional(string)
+    audit_non_hmac_response_keys = optional(list(string))
+    audit_non_hmac_request_keys  = optional(list(string))
     listing_visibility           = optional(string)
     passthrough_request_headers  = optional(string)
     allowed_response_headers     = optional(string)
