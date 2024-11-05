@@ -28,17 +28,21 @@ resource "vault_jwt_auth_backend" "this" {
 locals {
   workspaces = merge(flatten([for org, project in var.workspaces :
     [for proj, workspace in project : { for ws in workspace : replace(format("%s-%s-%s", org, proj, ws), "/\\W|_|\\s/", "-") => {
-      org           = org
-      project       = proj
-      ws            = ws
-      role_name     = replace(format(var.role_name_format, org, proj, ws), "/\\W|_|\\s/", "-")
-      identity_name = replace(format(var.identity_name_format, org, proj, ws), "/\\W|_|\\s/", "-")
+      org                = org
+      project            = proj
+      ws                 = ws
+      role_name          = replace(format(var.role_name_format, org, proj, ws), "/\\W|_|\\s/", "-")
+      identity_name      = replace(format(var.identity_name_format, org, proj, ws), "/\\W|_|\\s/", "-")
+      bound_claim_format = format("organization:%[1]s:project:%[2]s:workspace:%[3]s:run_phase:*", org, proj, ws)
     } }]
   ])...)
+
+  bound_subject = join(",", [for ws, workspace in local.workspaces : workspace.bound_claim_format])
+  orgs          = { for org in keys(var.workspaces) : org => org }
 }
 
 resource "vault_jwt_auth_backend_role" "roles" {
-  for_each = local.workspaces
+  for_each = var.enable_identity_management ? local.workspaces : {}
 
   namespace = var.namespace
 
@@ -101,4 +105,53 @@ resource "vault_identity_entity_alias" "workspaces" {
       error_message = "Identity Entity management only works when workspace names contains no wildcard"
     }
   }
+}
+
+
+resource "vault_jwt_auth_backend_role" "global_identity_role" {
+  count = var.enable_global_identity ? 1 : 0
+
+  namespace = var.namespace
+
+  backend         = vault_jwt_auth_backend.this.path
+  role_name       = "tfc-global-identity"
+  bound_audiences = var.bound_audiences
+  role_type       = "jwt"
+
+  bound_claims_type = "glob"
+  bound_claims = {
+    sub = local.bound_subject
+
+    terraform_organization_name = join(",", keys(local.orgs))
+  }
+
+  claim_mappings = var.claim_mappings
+  user_claim     = "terraform_organization_name"
+
+  token_policies         = var.token_policies
+  token_ttl              = var.token_ttl
+  token_max_ttl          = var.token_max_ttl
+  token_explicit_max_ttl = var.token_explicit_max_ttl
+}
+
+resource "vault_identity_entity" "orgs" {
+  for_each = var.enable_global_identity ? local.orgs : {}
+
+  namespace = var.namespace
+
+  name              = each.value
+  external_policies = true
+  metadata = {
+    terraform_organization_name = each.value
+  }
+}
+
+resource "vault_identity_entity_alias" "orgs" {
+  for_each = var.enable_global_identity ? local.orgs : {}
+
+  namespace = var.namespace
+
+  name           = each.value
+  mount_accessor = vault_jwt_auth_backend.this.accessor
+  canonical_id   = vault_identity_entity.orgs[each.key].id
 }
