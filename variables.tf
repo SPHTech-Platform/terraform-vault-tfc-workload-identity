@@ -126,3 +126,14 @@ variable "tfc_default_project" {
   type        = string
   default     = "Default Project"
 }
+
+variable "enable_global_identity" {
+  description = "Enable Identity Entity management globally. This creates a single entity for all workspaces per organization"
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = var.enable_global_identity != var.enable_identity_management
+    error_message = "Global Identity management can only be enabled if Identity management is disabled"
+  }
+}

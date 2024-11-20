@@ -10,9 +10,9 @@ output "workspaces" {
       org       = v.org
       project   = v.project
       workspace = v.ws
-      role      = vault_jwt_auth_backend_role.roles[k].role_name
     },
     var.enable_identity_management ? {
+      role           = vault_jwt_auth_backend_role.roles[k].role_name
       identity_name  = vault_identity_entity.workspaces[k].name
       identity_id    = vault_identity_entity.workspaces[k].id
       identity_alias = vault_identity_entity_alias.workspaces[k].name
